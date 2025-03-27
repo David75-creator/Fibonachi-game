@@ -184,11 +184,11 @@
             const feedback = document.getElementById("feedback");
 
             if (userAnswer === correctAnswer) {
-                feedback.innerText = "Правильно!";
+                feedback.innerText = "Ճիշտ է!";
                 feedback.style.color = 'green';
                 score++;
             } else {
-                feedback.innerText = `Неправильно! Правильный ответ: ${correctAnswer}`;
+                feedback.innerText = `Սխալ է! Ճիշտ պատասխան: ${correctAnswer}`;
                 feedback.style.color = 'red';
             }
 
@@ -203,7 +203,7 @@
         timerInterval = setInterval(() => {
             if (timeLeft > 0) {
                 timeLeft--;
-                document.getElementById("timer").innerText = `Время: ${timeLeft} секунд`;
+                document.getElementById("timer").innerText = `Ժամանակ: ${timeLeft} վայրկյան`;
             } else {
                 endGame();
             }
@@ -212,8 +212,8 @@
 
     function endGame() {
         clearInterval(timerInterval);
-        document.getElementById("question").innerText = "Игра завершена!";
-        document.getElementById("score").innerText = `Ваш счёт: ${score} из ${questions.length}`;
+        document.getElementById("question").innerText = "Խաղը ավարտված է!";
+        document.getElementById("score").innerText = `Ձեր հաշիվը: ${score} ից ${questions.length}`;
         document.getElementById("options").style.display = 'none';
         document.querySelector("button").style.display = 'none';
         document.getElementById("timer").style.display = 'none';
