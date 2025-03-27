@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра о последовательности Фибоначчи</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .question {
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+        .timer {
+            font-size: 1.5em;
+            color: #ff4500;
+            text-align: center;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Игра о последовательности Фибоначчи</h1>
+
+    <div class="timer" id="timer">Время: 60 секунд</div>
+
+    <div class="question" id="question"></div>
+
+    <ul class="options" id="options"></ul>
+
+    <button onclick="checkAnswer()">Ответить</button>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="score" id="score"></div>
+</div>
+
+<script>
+    const questions = [
+        {
+            question: "Кто впервые представил последовательность Фибоначчи в западном мире?",
+            options: ["Леонардо Пизанский", "Исаак Ньютон", "Галилео Галилей", "Рене Декарт"],
+            correctAnswer: "Леонардо Пизанский"
+        },
+        {
+            question: "Как называется книга, в которой Фибоначчи впервые представил последовательность?",
+            options: ["Liber Abaci", "Principia Mathematica", "Almagest", "De Revolutionibus"],
+            correctAnswer: "Liber Abaci"
+        },
+        {
+            question: "Какое соотношение чисел Фибоначчи используется при большем их значении?",
+            options: ["Золотое сечение", "Пи", "Квадратный корень из 2", "Естественная константа"],
+            correctAnswer: "Золотое сечение"
+        },
+        {
+            question: "Какой известный математический констант тесно связан с последовательностью Фибоначчи?",
+            options: ["Фи (Φ)", "Пи (π)", "Е (e)", "Ноль"],
+            correctAnswer: "Фи (Φ)"
+        },
+        {
+            question: "Какова сумма первых n чисел Фибоначчи?",
+            options: ["F(n+2) - 1", "F(n+1)", "F(n) * 2", "F(n) + 1"],
+            correctAnswer: "F(n+2) - 1"
+        },
+        {
+            question: "Как последовательность Фибоначчи связана с спиральными узорами в природе?",
+            options: [
+                "Числа Фибоначчи описывают закономерности спирального роста",
+                "Последовательность Фибоначчи используется для вычисления углов",
+                "Числа Фибоначчи описывают прямолинейный рост",
+                "Это не имеет отношения к природе"
+            ],
+            correctAnswer: "Числа Фибоначчи описывают закономерности спирального роста"
+        },
+        {
+            question: "Как называется замкнутая формула для последовательности Фибоначчи?",
+            options: ["Формула Бине", "Пифагорова теорема", "Формула Эйлера", "Гамильтоново уравнение"],
+            correctAnswer: "Формула Бине"
+        },
+        {
+            question: "Какая связь существует между последовательностью Фибоначчи и треугольником Паскаля?",
+            options: [
+                "Числа Фибоначчи появляются на диагоналях треугольника Паскаля",
+                "Они никак не связаны",
+                "Они являются противоположными последовательностями",
+                "Они связаны через геометрические фигуры"
+            ],
+            correctAnswer: "Числа Фибоначчи появляются на диагоналях треугольника Паскаля"
+        },
+        {
+            question: "Каково математическое значение последовательности Фибоначчи в информатике?",
+            options: [
+                "Используется в алгоритмах, таких как Фибоначчиево поисковое дерево",
+                "Используется для вычисления площади",
+                "Используется в криптографии",
+                "Не имеет значения в информатике"
+            ],
+            correctAnswer: "Используется в алгоритмах, таких как Фибоначчиево поисковое дерево"
+        },
+        {
+            question: "Можно ли использовать последовательность Фибоначчи для предсказания тенденций на фондовом рынке?",
+            options: [
+                "Да, через уровни восстановления Фибоначчи",
+                "Нет, она не имеет отношения к рынкам",
+                "Да, для вычисления долгосрочных трендов",
+                "Нет, только для вычислений в математике"
+            ],
+            correctAnswer: "Да, через уровни восстановления Фибоначчи"
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeLeft = 60; // Timer set to 60 seconds
+    let timerInterval;
+
+    function loadQuestion() {
+        if (currentQuestionIndex < questions.length) {
+            const question = questions[currentQuestionIndex];
+            document.getElementById("question").innerText = question.question;
+
+            const optionsList = document.getElementById("options");
+            optionsList.innerHTML = ''; // Clear previous options
+
+            question.options.forEach(option => {
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `<label><input type="radio" name="option" value="${option}"> ${option}</label>`;
+                optionsList.appendChild(listItem);
+            });
+
+            document.getElementById("feedback").innerText = '';
+        } else {
+            endGame();
+        }
+    }
+
+    function checkAnswer() {
+        const selectedOption = document.querySelector('input[name="option"]:checked');
+        if (selectedOption) {
+            const userAnswer = selectedOption.value;
+            const correctAnswer = questions[currentQuestionIndex].correctAnswer;
+            const feedback = document.getElementById("feedback");
+
+            if (userAnswer === correctAnswer) {
+                feedback.innerText = "Правильно!";
+                feedback.style.color = 'green';
+                score++;
+            } else {
+                feedback.innerText = `Неправильно! Правильный ответ: ${correctAnswer}`;
+                feedback.style.color = 'red';
+            }
+
+            currentQuestionIndex++;
+            setTimeout(loadQuestion, 2000);
+        } else {
+            alert("Выберите ответ!");
+        }
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                document.getElementById("timer").innerText = `Время: ${timeLeft} секунд`;
+            } else {
+                endGame();
+            }
+        }, 1000);
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        document.getElementById("question").innerText = "Игра завершена!";
+        document.getElementById("score").innerText = `Ваш счёт: ${score} из ${questions.length}`;
+        document.getElementById("options").style.display = 'none';
+        document.querySelector("button").style.display = 'none';
+        document.getElementById("timer").style.display = 'none';
+    }
+
+    // Start the game
+    loadQuestion();
+    startTimer();
+</script>
+
+</body>
+</html>
